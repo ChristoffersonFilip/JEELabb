@@ -8,6 +8,8 @@ import java.util.List;
 @Local
 public interface StudentTransactionAccess {
     List listAllStudents();
+    List findStudentByName(String name);
+    List findByEmail(String email);
     Student addStudent(Student studentToAdd);
     void removeStudent(String student);
     void updateStudent(String forename, String lastname, String email);

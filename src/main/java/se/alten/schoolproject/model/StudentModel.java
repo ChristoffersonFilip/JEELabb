@@ -17,6 +17,7 @@ public class StudentModel {
 
     public StudentModel toModel(Student student) {
         StudentModel studentModel = new StudentModel();
+        /*
         switch (student.getForename()) {
             case "empty":
                 studentModel.setForename("empty");
@@ -25,10 +26,13 @@ public class StudentModel {
                 studentModel.setForename("duplicate");
                 return studentModel;
             default:
+                */
+                studentModel.setId(null);
                 studentModel.setForename(student.getForename());
                 studentModel.setLastname(student.getLastname());
                 studentModel.setEmail(student.getEmail());
                 return studentModel;
         }
-    }
+
 }
+

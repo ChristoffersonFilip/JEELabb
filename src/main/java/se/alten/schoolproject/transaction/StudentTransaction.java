@@ -24,6 +24,20 @@ public class StudentTransaction implements StudentTransactionAccess{
     }
 
     @Override
+    public List findStudentByName(String name){
+        return entityManager.createQuery("SELECT s from Student s WHERE s.forename LIKE :name", Student.class)
+                .setParameter("name", name)
+                .getResultList();
+       }
+
+    @Override
+    public List findByEmail(String email) {
+        return entityManager.createQuery("SELECT s from Student s WHERE s.email LIKE :email", Student.class)
+                .setParameter("email", email)
+                .getResultList();
+    }
+
+    @Override
     public Student addStudent(Student studentToAdd) {
         try {
             entityManager.persist(studentToAdd);

@@ -6,7 +6,9 @@ import se.alten.schoolproject.transaction.StudentTransactionAccess;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Stateless
@@ -19,8 +21,29 @@ public class SchoolDataAccess implements SchoolAccessLocal, SchoolAccessRemote {
     StudentTransactionAccess studentTransactionAccess;
 
     @Override
-    public List listAllStudents(){
+    public List<Student> listAllStudents() {
         return studentTransactionAccess.listAllStudents();
+    }
+
+    @Override
+    public List findByName(String name) {
+        List foundByName = new ArrayList();
+        for(Student s : listAllStudents()) {
+            if(s.getForename().equals(name)){
+                foundByName.add(s);
+            }
+        }
+        return foundByName;
+    }
+
+    @Override
+    public List findByEmail(String email){
+        List foundByEmail = new ArrayList();
+        for (Student s: listAllStudents()) {
+            if(s.getEmail().equals(email))
+            foundByEmail.add(s);
+        }
+        return foundByEmail;
     }
 
     @Override
@@ -28,13 +51,21 @@ public class SchoolDataAccess implements SchoolAccessLocal, SchoolAccessRemote {
         Student studentToAdd = student.toEntity(newStudent);
         boolean checkForEmptyVariables = Stream.of(studentToAdd.getForename(), studentToAdd.getLastname(), studentToAdd.getEmail()).anyMatch(String::isBlank);
 
+        if(checkForEmptyVariables){
+            return studentModel.toModel(studentToAdd);
+        }
+
+        /*
         if (checkForEmptyVariables) {
             studentToAdd.setForename("empty");
             return studentModel.toModel(studentToAdd);
+
         } else {
             studentTransactionAccess.addStudent(studentToAdd);
             return studentModel.toModel(studentToAdd);
-        }
+            */
+        studentTransactionAccess.addStudent(studentToAdd);
+        return studentModel.toModel(studentToAdd);
     }
 
     @Override
