@@ -33,17 +33,25 @@ public class SchoolDataAccess implements SchoolAccessLocal, SchoolAccessRemote {
                 foundByName.add(s);
             }
         }
+        if(foundByName.isEmpty()){
+            throw new NullPointerException();
+        }
         return foundByName;
     }
 
     @Override
-    public List findByEmail(String email){
+    public List findByEmail(String email) {
         List foundByEmail = new ArrayList();
+
         for (Student s: listAllStudents()) {
-            if(s.getEmail().equals(email))
-            foundByEmail.add(s);
+            if (s.getEmail().equals(email))
+                foundByEmail.add(s);
+        }
+        if(foundByEmail.isEmpty()){
+            throw new NullPointerException();
         }
         return foundByEmail;
+
     }
 
     @Override
@@ -51,25 +59,24 @@ public class SchoolDataAccess implements SchoolAccessLocal, SchoolAccessRemote {
         Student studentToAdd = student.toEntity(newStudent);
         boolean checkForEmptyVariables = Stream.of(studentToAdd.getForename(), studentToAdd.getLastname(), studentToAdd.getEmail()).anyMatch(String::isBlank);
 
-        if(checkForEmptyVariables){
-            return studentModel.toModel(studentToAdd);
-        }
-
-        /*
         if (checkForEmptyVariables) {
             studentToAdd.setForename("empty");
             return studentModel.toModel(studentToAdd);
+        }
 
-        } else {
+         else {
             studentTransactionAccess.addStudent(studentToAdd);
             return studentModel.toModel(studentToAdd);
-            */
-        studentTransactionAccess.addStudent(studentToAdd);
-        return studentModel.toModel(studentToAdd);
+        }
     }
+
 
     @Override
     public void removeStudent(String studentEmail) {
+        if(studentEmail.equals(findByEmail(studentEmail))){
+            throw new NullPointerException();
+        }
+        else
         studentTransactionAccess.removeStudent(studentEmail);
     }
 
@@ -81,6 +88,9 @@ public class SchoolDataAccess implements SchoolAccessLocal, SchoolAccessRemote {
     @Override
     public void updateStudentPartial(String studentModel) {
         Student studentToUpdate = student.toEntity(studentModel);
+        if(studentToUpdate.getForename().isBlank() || studentToUpdate.getEmail().isBlank() || studentToUpdate.getLastname().isBlank()){
+            throw new NullPointerException();
+        }
         studentTransactionAccess.updateStudentPartial(studentToUpdate);
     }
 }

@@ -48,7 +48,6 @@ public class StudentTransaction implements StudentTransactionAccess{
             return studentToAdd;
         }
     }
-
     @Override
     public void removeStudent(String student) {
         //JPQL Query
