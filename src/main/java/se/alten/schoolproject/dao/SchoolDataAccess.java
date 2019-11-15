@@ -1,8 +1,12 @@
 package se.alten.schoolproject.dao;
 
+import javassist.NotFoundException;
 import se.alten.schoolproject.entity.Student;
+import se.alten.schoolproject.entity.Subject;
 import se.alten.schoolproject.model.StudentModel;
+import se.alten.schoolproject.model.SubjectModel;
 import se.alten.schoolproject.transaction.StudentTransactionAccess;
+import se.alten.schoolproject.transaction.SubjectTransactionAccess;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -15,43 +19,55 @@ import java.util.stream.Stream;
 public class SchoolDataAccess implements SchoolAccessLocal, SchoolAccessRemote {
 
     private Student student = new Student();
+    private Subject subject = new Subject();
     private StudentModel studentModel = new StudentModel();
+    private SubjectModel subjectModel = new SubjectModel();
+
+    @Inject
+    SubjectTransactionAccess subjectTransactionAccess;
 
     @Inject
     StudentTransactionAccess studentTransactionAccess;
 
     @Override
     public List<Student> listAllStudents() {
-        return studentTransactionAccess.listAllStudents();
+        return studentModel.toModelList(studentTransactionAccess.listAllStudents());
     }
 
     @Override
-    public List findByName(String name) {
-        List foundByName = new ArrayList();
-        for(Student s : listAllStudents()) {
-            if(s.getForename().equals(name)){
-                foundByName.add(s);
+    public StudentModel findByName(String firstname){
+        List<Student> originalList = studentTransactionAccess.listAllStudents();
+        StudentModel findByName;
+        //For-each loop through originalList,
+        for(Student s: originalList) {
+            //if firstname from orginalList equals input firstname,
+            if(s.getForename().equals(firstname)){
+                //put information s in a new studentModel
+                findByName = studentModel.toModel(s);
+                //return the new model
+                return findByName;
             }
         }
-        if(foundByName.isEmpty()){
-            throw new NullPointerException();
-        }
-        return foundByName;
+        //if not equal to email return empty model
+        return findByName = new StudentModel();
     }
 
     @Override
-    public List findByEmail(String email) {
-        List foundByEmail = new ArrayList();
-
-        for (Student s: listAllStudents()) {
-            if (s.getEmail().equals(email))
-                foundByEmail.add(s);
+    public StudentModel findByEmail(String email){
+        List<Student> studentList = studentTransactionAccess.listAllStudents();
+        StudentModel findEmail;
+        //For-each loop through originalList,
+        for (Student student: studentList) {
+            //if email from orginalList equals input email,
+            if(student.getEmail().contains(email)){
+                //put information s in a new studentModel
+                findEmail = studentModel.toModel(student);
+                //return the new model
+                return findEmail;
+            }
         }
-        if(foundByEmail.isEmpty()){
-            throw new NullPointerException();
-        }
-        return foundByEmail;
-
+        //if not equal to email return empty model
+        return findEmail = new StudentModel();
     }
 
     @Override
@@ -66,19 +82,25 @@ public class SchoolDataAccess implements SchoolAccessLocal, SchoolAccessRemote {
 
          else {
             studentTransactionAccess.addStudent(studentToAdd);
+            List<Subject> subjects = subjectTransactionAccess.getSubjectByName(studentToAdd.getSubjects());
+
+            subjects.forEach(subject -> {
+                studentToAdd.getSubject().add(subject);
+            });
             return studentModel.toModel(studentToAdd);
         }
     }
 
 
     @Override
-    public void removeStudent(String studentEmail) {
-        if(studentEmail.equals(findByEmail(studentEmail))){
+    public void removeStudent(String studentEmail) throws NullPointerException {
+        if(findByEmail(studentEmail).getEmail().equals(studentEmail)){
+            studentTransactionAccess.removeStudent(studentEmail);
+        }
+        else {
             throw new NullPointerException();
         }
-        else
-        studentTransactionAccess.removeStudent(studentEmail);
-    }
+        }
 
     @Override
     public void updateStudent(String forename, String lastname, String email) {
@@ -92,5 +114,17 @@ public class SchoolDataAccess implements SchoolAccessLocal, SchoolAccessRemote {
             throw new NullPointerException();
         }
         studentTransactionAccess.updateStudentPartial(studentToUpdate);
+    }
+
+    @Override
+    public List listAllSubjects() {
+        return subjectModel.toModelList(subjectTransactionAccess.listAllSubjects());
+    }
+
+    @Override
+    public SubjectModel addSubject(String newSubject) {
+        Subject subjectToAdd = subject.toEntity(newSubject);
+        subjectTransactionAccess.addSubject(subjectToAdd);
+        return subjectModel.toModel(subjectToAdd);
     }
 }

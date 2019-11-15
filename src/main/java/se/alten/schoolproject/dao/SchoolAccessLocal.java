@@ -2,6 +2,7 @@ package se.alten.schoolproject.dao;
 
 import se.alten.schoolproject.entity.Student;
 import se.alten.schoolproject.model.StudentModel;
+import se.alten.schoolproject.model.SubjectModel;
 
 import javax.ejb.Local;
 import java.util.List;
@@ -12,9 +13,9 @@ public interface SchoolAccessLocal {
 
     List<Student> listAllStudents() throws Exception;
 
-    List findByName(String name);
+    StudentModel findByName(String name);
 
-    List findByEmail(String email);
+    StudentModel findByEmail(String email);
 
     StudentModel addStudent(String studentModel);
 
@@ -23,4 +24,8 @@ public interface SchoolAccessLocal {
     void updateStudent(String forename, String lastname, String email);
 
     void updateStudentPartial(String studentModel);
+
+    List listAllSubjects();
+
+    SubjectModel addSubject(String subjectModel);
 }

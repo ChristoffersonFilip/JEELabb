@@ -35,8 +35,8 @@ public class StudentController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response findByEmail(@PathParam("email") String email){
         try {
-                List studentList = sal.findByEmail(email);
-                return Response.ok(studentList).build();
+                StudentModel student = sal.findByEmail(email);
+                return Response.ok(student).build();
         } catch (Exception e){
             return Response.status(Response.Status.NOT_FOUND).entity("{\"Student does not exist\"}").build();
         }
@@ -44,12 +44,14 @@ public class StudentController {
 
 
     @GET
-    @Path("/find/{name}")
+    @Path("/{name}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response findStudentByEmail(@PathParam("name") String name){
         try {
-            List studentList = sal.findByName(name);
-            return Response.ok(studentList).build();
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
+            StudentModel student = sal.findByName(name);
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            return Response.ok(student).build();
 
         } catch (Exception e){
             return Response.status(Response.Status.BAD_REQUEST).entity("{\"Student does not exist\"}").build();
